@@ -6,4 +6,4 @@
 - python manage.py makemigrations
 - python manage.py sqlmigrate api 0004 
 - python manage.py migrate
-where `0004` is the migration code of the api app it will be generated automatically when you run `python manage.py makemigrations`
+Where `0004` is the migration code of the api app it will be generated automatically when you run `python manage.py makemigrations`
