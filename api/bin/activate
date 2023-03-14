@@ -38,7 +38,11 @@ deactivate () {
 # unset irrelevant variables
 deactivate nondestructive
 
+<<<<<<< HEAD
 VIRTUAL_ENV="/Applications/MAMP/htdocs/APP_API/api"
+=======
+VIRTUAL_ENV="/Applications/MAMP/htdocs/API_APP/api"
+>>>>>>> f489a6e37070fbe2e3ca015fc8ab41eabd703b4a
 export VIRTUAL_ENV
 
 _OLD_VIRTUAL_PATH="$PATH"

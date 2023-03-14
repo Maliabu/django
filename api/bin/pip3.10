@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 #!/Applications/MAMP/htdocs/APP_API/api/bin/python3
+=======
+#!/Applications/MAMP/htdocs/API_APP/api/bin/python3
+>>>>>>> f489a6e37070fbe2e3ca015fc8ab41eabd703b4a
 # -*- coding: utf-8 -*-
 import re
 import sys

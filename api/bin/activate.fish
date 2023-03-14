@@ -30,7 +30,11 @@ end
 # Unset irrelevant variables.
 deactivate nondestructive
 
+<<<<<<< HEAD
 set -gx VIRTUAL_ENV "/Applications/MAMP/htdocs/APP_API/api"
+=======
+set -gx VIRTUAL_ENV "/Applications/MAMP/htdocs/API_APP/api"
+>>>>>>> f489a6e37070fbe2e3ca015fc8ab41eabd703b4a
 
 set -gx _OLD_VIRTUAL_PATH $PATH
 set -gx PATH "$VIRTUAL_ENV/bin" $PATH
