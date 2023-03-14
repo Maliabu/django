@@ -26,7 +26,7 @@ SECRET_KEY = 'django-insecure-kxalm28$*yh2e)&+hi1ifw-pn@i+8zw20kpnpz$8w069m9+2-4
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
@@ -45,6 +45,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
 ]
 
+SITE_ID = 1
+
 #REST API AUTH
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
@@ -59,6 +61,7 @@ REST_FRAMEWORK = {
 
 
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -89,6 +92,16 @@ TEMPLATES = [
 WSGI_APPLICATION = 'cyanase.wsgi.application'
 
 CORS_ORIGIN_ALLOW_ALL = True
+
+
+# SETUP EMAILS
+
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'mail.cyanase.com'
+EMAIL_USE_TLS = True
+EMAIL_PORT = 587
+EMAIL_HOST_USER = "no-reply@cyanase.com" #sender's email-id
+EMAIL_HOST_PASSWORD = "xxxxxxxxxxxx" #password associated with above email-id
 
 # Database
 # https://docs.djangoproject.com/en/4.0/ref/settings/#databases

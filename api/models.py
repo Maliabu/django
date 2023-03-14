@@ -3,40 +3,7 @@ from django.contrib.auth.models import User
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from datetime import date
-from enumchoicefield import ChoiceEnum, EnumChoiceField
-# Create your models here.
-class AthousandSeparator(models.Model):
-    dispaly_name = models.CharField(max_length=255)
-    code_name = models.CharField(max_length=255)
-    is_default = models.BooleanField(default=False)
-    is_disabled = models.BooleanField(default=False)
-    created = models.DateTimeField(auto_now_add=True)
-    has_been_modified = models.BooleanField(default=False)
-    last_modified = models.DateTimeField()
-    def __str__(self):
-       return "%s" % self.dispaly_name
 
-class DateFormats(models.Model):
-    dispaly_name = models.CharField(max_length=255)
-    date_format = models.CharField(max_length=255)
-    is_default = models.BooleanField(default=False)
-    is_disabled = models.BooleanField(default=False)
-    created = models.DateTimeField(auto_now_add=True)
-    has_been_modified = models.BooleanField(default=False)
-    last_modified = models.DateTimeField()
-    def __str__(self):
-       return "%s" % self.dispaly_name
-
-class DecimalSeparator(models.Model):
-    dispaly_name = models.CharField(max_length=255)
-    code_name = models.CharField(max_length=255)
-    is_default = models.BooleanField(default=False)
-    is_disabled = models.BooleanField(default=False)
-    created = models.DateTimeField(auto_now_add=True)
-    has_been_modified = models.BooleanField(default=False)
-    last_modified = models.DateTimeField()
-    def __str__(self):
-       return "%s" % self.dispaly_name
 
 class SupportedLanguage(models.Model):
     lang_name = models.CharField(max_length=255)
@@ -58,7 +25,7 @@ class SupportedCountry(models.Model):
     def __str__(self):
        return "%s" % self.coutry_name
 
-class TimeZones(models.Model):
+class TimeZone(models.Model):
     country = models.ForeignKey(SupportedCountry, on_delete=models.CASCADE, null=True, blank=True)
     dispaly_name = models.CharField(max_length=255)
     code_name = models.CharField(max_length=255)
@@ -69,6 +36,35 @@ class TimeZones(models.Model):
     last_modified = models.DateTimeField()
     def __str__(self):
        return "%s" % self.dispaly_name
+
+# User Profile
+class UserProfile(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    country = models.ForeignKey(SupportedCountry, on_delete=models.CASCADE, null=True, blank=True)
+    language = models.ForeignKey(SupportedLanguage, on_delete=models.CASCADE, null=True, blank=True)
+    tmz = models.ForeignKey(TimeZone, on_delete=models.CASCADE, null=True, blank=True)
+    gender = models.CharField(max_length=255, null=True, blank=True)
+    phoneno = models.CharField(max_length=255, null=True, blank=True)
+    address = models.CharField(max_length=30, null=True, blank=True)
+    verification_code = models.CharField(max_length=30, null=True, blank=True)
+    birth_date = models.DateField(null=True, blank=True)
+    profile_picture = models.CharField(max_length=255, null=True, blank=True)
+    is_verified = models.BooleanField(default=False)
+    is_deleted = models.BooleanField(default=True)
+    is_disabled = models.BooleanField(default=False)
+    created = models.DateTimeField(auto_now_add=True)
+    def __str__(self):
+        return "%s" % self.user
+
+@receiver(post_save, sender=User)
+def create_user_profile(sender, instance, created, **kwargs):
+    if created:
+        UserProfile.objects.create(user=instance)
+
+@receiver(post_save, sender=User)
+def save_user_profile(sender, instance, **kwargs):
+    instance.userprofile.save()
+
 
 class Currency(models.Model):
     country = models.ForeignKey(SupportedCountry, on_delete=models.CASCADE, null=True, blank=True)
@@ -84,18 +80,6 @@ class Currency(models.Model):
     created = models.DateTimeField(auto_now_add=True)
     def __str__(self):
        return "%s" % self.currency_locale
-
-# Main Application Modules
-class ModuleGroup(models.Model):
-    module_group_name = models.CharField(max_length=255)
-    code_name = models.CharField(max_length=255)
-    sort_value = models.IntegerField()
-    is_disabled = models.BooleanField(default=False)
-    created = models.DateTimeField(auto_now_add=True)
-    has_been_modified = models.BooleanField(default=False)
-    last_modified = models.DateTimeField()
-    def __str__(self):
-        return "%s" % self.module_group_name
 
 # Main Application Modules
 class Module(models.Model):
@@ -126,7 +110,6 @@ class SideMenu(models.Model):
 # Dashboard menu model
 class DashboardMenu(models.Model):
     module = models.ForeignKey(Module, on_delete=models.DO_NOTHING)
-    group = models.ForeignKey(ModuleGroup, on_delete=models.DO_NOTHING, null=True, blank=True)
     sort_value = models.IntegerField()
     is_disabled = models.BooleanField(default=False)
     created = models.DateTimeField(auto_now_add=True)
@@ -134,34 +117,6 @@ class DashboardMenu(models.Model):
     last_modified = models.DateTimeField()
     def __str__(self):
         return "%s" % self.module.module_name
-
-
-# User Profile
-class UserProfile(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
-    country = models.ForeignKey(SupportedCountry, on_delete=models.CASCADE, null=True, blank=True)
-    gender = models.CharField(max_length=255, null=True, blank=True)
-    phoneno = models.CharField(max_length=255, null=True, blank=True)
-    address = models.CharField(max_length=30, null=True, blank=True)
-    email_verification_code = models.CharField(max_length=30, null=True, blank=True)
-    birth_date = models.DateField(null=True, blank=True)
-    profile_picture = models.CharField(max_length=255, null=True, blank=True)
-    is_verified = models.BooleanField(default=False)
-    is_deleted = models.BooleanField(default=True)
-    is_disabled = models.BooleanField(default=False)
-    created = models.DateTimeField(auto_now_add=True)
-    def __str__(self):
-        return "%s" % self.user
-
-@receiver(post_save, sender=User)
-def create_user_profile(sender, instance, created, **kwargs):
-    if created:
-        UserProfile.objects.create(user=instance)
-
-@receiver(post_save, sender=User)
-def save_user_profile(sender, instance, **kwargs):
-    instance.userprofile.save()
-
 
 class PaymentType(models.Model):
     payment_name = models.CharField(max_length=200)
@@ -177,7 +132,98 @@ class PaymentType(models.Model):
     created = models.DateTimeField(auto_now_add=True)
     def __str__(self):
        return "%s" % self.payment_name
+    
 
+class PaymentMethod(models.Model):
+    en_payment_method_name = models.CharField(max_length=200)
+    code_name = models.CharField(max_length=200)
+    is_default = models.BooleanField(default=False)
+    is_disabled = models.BooleanField(default=False)
+    created = models.DateTimeField(auto_now_add=True)
+    def __str__(self):
+       return "%s" % self.en_payment_method_name
+
+class PaymentOption(models.Model):
+    payment_method = models.ForeignKey(PaymentMethod, on_delete=models.DO_NOTHING)
+    en_payment_option_name = models.CharField(max_length=200)
+    code_name = models.CharField(max_length=200)
+    payment_option_logo = models.CharField(max_length=200, null=True, blank=True)
+    sort_value = models.IntegerField(default=0)
+    has_standarded_charge = models.BooleanField(default=False)
+    payment_charge = models.FloatField(default=0, blank=True, null=True)
+    charge_in_percentage = models.BooleanField(default=True)
+    charge_fees_on_user = models.BooleanField(default=True)
+    has_pre_inputs = models.BooleanField(default=False)
+    is_default = models.BooleanField(default=False)
+    is_disabled = models.BooleanField(default=False)
+    created = models.DateTimeField(auto_now_add=True)
+    def __str__(self):
+        return "%s [%s]" % (self.en_payment_option_name, self.code_name)
+    
+class PaymentOptionField(models.Model):
+    payment_option = models.ForeignKey(PaymentOption, on_delete=models.DO_NOTHING)
+    en_entry_name = models.CharField(max_length=500)
+    entry_code_name = models.CharField(max_length=255)
+    has_entry_value = models.BooleanField(default=False)
+    entry_value = models.CharField(max_length=500, null=True, blank=True)
+    is_a_float = models.BooleanField(default=False)
+    is_a_int = models.BooleanField(default=False)
+    is_a_string = models.BooleanField(default=True)
+    is_required = models.BooleanField(default=True)
+    is_default = models.BooleanField(default=True)
+    is_active = models.BooleanField(default=True)
+    is_disabled = models.BooleanField(default=False)
+    created = models.DateTimeField(auto_now_add=True)
+    def __str__(self):
+        return "[%s] %s : %s" % (str(self.payment_option), self.en_entry_name, str(self.entry_value))
+    
+class PaymentOptionSetting(models.Model):
+    payment_option = models.ForeignKey(PaymentOption, on_delete=models.DO_NOTHING)
+    en_entry_name = models.CharField(max_length=500)
+    entry_code_name = models.CharField(max_length=255)
+    has_entry_value = models.BooleanField(default=False)
+    entry_value = models.CharField(max_length=500, null=True, blank=True)
+    is_required = models.BooleanField(default=True)
+    is_default = models.BooleanField(default=True)
+    is_active = models.BooleanField(default=True)
+    is_disabled = models.BooleanField(default=False)
+    created = models.DateTimeField(auto_now_add=True)
+    def __str__(self):
+        return "[%s] %s : %s" % (str(self.payment_option), self.en_entry_name, str(self.entry_value))
+    
+
+class PaymentOptionSupport(models.Model):
+    payment_type = models.ForeignKey(PaymentType, on_delete=models.DO_NOTHING)
+    payment_option = models.ForeignKey(PaymentOption, on_delete=models.DO_NOTHING)
+    country = models.ForeignKey(SupportedCountry, on_delete=models.DO_NOTHING)
+    is_disabled = models.BooleanField(default=False)
+    is_default = models.BooleanField(default=False)
+    created = models.DateTimeField(auto_now_add=True)
+    def __str__(self):
+        return "%s (%s)" % (self.payment_option, self.country)
+
+class PaymentTypeOption(models.Model):
+    payment_type = models.ForeignKey(PaymentType, on_delete=models.DO_NOTHING)
+    payment_option = models.ForeignKey(PaymentOption, on_delete=models.DO_NOTHING)
+    is_disabled = models.BooleanField(default=False)
+    is_default = models.BooleanField(default=False)
+    created = models.DateTimeField(auto_now_add=True)
+    def __str__(self):
+        return "%s (%s)" % (self.payment_option, self.payment_option)
+
+
+class RegionalPaymentType(models.Model):
+    payment_type = models.ForeignKey(PaymentType, on_delete=models.DO_NOTHING)
+    country = models.ForeignKey(SupportedCountry, on_delete=models.DO_NOTHING)
+    sort_value = models.IntegerField()
+    is_disabled = models.BooleanField(default=False)
+    is_default = models.BooleanField(default=False)
+    created = models.DateTimeField(auto_now_add=True)
+    has_been_modified = models.BooleanField(default=False)
+    last_modified = models.DateTimeField()
+    def __str__(self):
+        return "%s (%s)" % (self.payment_type, self.country)
+    
 class PaymentTypeSetting(models.Model):
     payment_type = models.ForeignKey(PaymentType, on_delete=models.DO_NOTHING)
     entry_name = models.CharField(max_length=500)
@@ -189,7 +235,6 @@ class PaymentTypeSetting(models.Model):
     is_active = models.BooleanField(default=True)
     is_disabled = models.BooleanField(default=False)
     created = models.DateTimeField(auto_now_add=True)
-    has_been_modified = models.BooleanField(default=False)
     def __str__(self):
         return "[%s] %s : %s" % (str(self.payment_type), self.entry_name, str(self.entry_value))
 
@@ -224,10 +269,6 @@ class AccountType(models.Model):
     def __str__(self):
        return "%s" % self.type_name
 
-class DrCr(ChoiceEnum):
-    dr = "D"
-    cr = "C"
-
 class Account(models.Model):
     account_type = models.ForeignKey(AccountType, on_delete=models.CASCADE)
     owner = models.ForeignKey(User, on_delete=models.CASCADE)
@@ -241,11 +282,9 @@ class Account(models.Model):
     allow_over_drafts = models.BooleanField(default=False)
     narration = models.CharField(max_length=3000, null=True, blank=True)
     is_disabled = models.BooleanField(default=False)
-    created = models.DateTimeField(auto_now_add=True)
     is_editable = models.BooleanField(default=True)
     is_deletable = models.BooleanField(default=True)
-    has_been_modified = models.BooleanField(default=False)
-    last_modified = models.DateTimeField()
+    created = models.DateTimeField(auto_now_add=True)
     def __str__(self):
         return "%s" % self.account_name
 
@@ -254,12 +293,12 @@ class Account(models.Model):
 class LedgerEntry(models.Model):
     ledger_no = models.IntegerField()
     account = models.ForeignKey(Account, on_delete=models.CASCADE)
-    entry_type = EnumChoiceField(DrCr, default=DrCr.dr)
+    entry_type = models.CharField(max_length=255)
     is_adjusting_entry = models.BooleanField(default=False)
     amount = models.FloatField(default=0)
     narration = models.CharField(max_length=5000, null=True, blank=True)
     is_disabled = models.BooleanField(default=False)
-    created = models.DateTimeField(auto_now_add=True)
     is_deleted = models.BooleanField(default=False)
+    created = models.DateTimeField(auto_now_add=True)
     def __str__(self):
         return "%s - %s" % (self.account, self.amount)
