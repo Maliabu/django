@@ -38,7 +38,9 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "rest_framework",
-    "user"
+    "rest_framework.authtoken",
+    # "user",
+    "api"
 ]
 
 MIDDLEWARE = [
@@ -77,8 +79,14 @@ WSGI_APPLICATION = "core.wsgi.application"
 
 DATABASES = {
     "default": {
-        "ENGINE": "django.db.backends.sqlite3",
-        "NAME": BASE_DIR / "db.sqlite3",
+        # 'ENGINE': 'django.db.backends.sqlite3',
+        # 'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'cyanase',
+        'USER': 'root',
+        'PASSWORD': 'root',
+        'HOST': '127.0.0.1', # chnaged from localhost
+        'PORT': '3306',
     }
 }
 
@@ -124,8 +132,10 @@ STATIC_URL = "static/"
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
-AUTH_USER_MODEL = "user.User"
+# AUTH_USER_MODEL = "user.User"
 
 CORS_ORIGIN_ALLOW_ALL = True
 
 CORS_ALLOW_CREDENTIALS = True
+
+# CSRF_TRUSTED_ORIGINS = ['https://warped-space-546281.postman.co/workspace/CyanaseTeamWorkspace~86e4e2cf-9b77-42a2-8e89-ab61a1bc7d8c/request/8084036-8aed0320-5c3e-4757-b0c5-c9902d4dfeb2']

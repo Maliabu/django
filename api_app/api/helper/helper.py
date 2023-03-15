@@ -8,7 +8,7 @@ from django.core.validators import validate_email
 from django.utils import timezone
 import datetime
 from dateutil.relativedelta import relativedelta
-from django.db import connection
+from django.db import connection 
 import requests
 from api.config import webconfig
 
